@@ -9,6 +9,8 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    let networkWeatherManager = NetworkWeatherManager()
 
     @IBOutlet weak var weatherIconImageView: UIImageView!
     @IBOutlet weak var cityLabel: UILabel!
@@ -17,12 +19,15 @@ class ViewController: UIViewController {
     
     
     @IBAction func searchPressed(_ sender: UIButton) {
-        self.presentSearchAlertController(withTitle: "Enter city name", message: nil, style: .alert)
+        self.presentSearchAlertController(withTitle: "Enter city name", message: nil, style: .alert) { city in
+            self.networkWeatherManager.fetchCurrentWeather(forCity: city)
+        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        
+        networkWeatherManager.fetchCurrentWeather(forCity: "London")
     }
 }
 
