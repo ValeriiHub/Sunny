@@ -11,14 +11,31 @@ protocol NetworkWeatherManagerDelegate: AnyObject {
 }
 
 import Foundation
+import CoreLocation
 
 class NetworkWeatherManager {
     
     weak var delegate: NetworkWeatherManagerDelegate?
     
-    func fetchCurrentWeather(forCity city: String) {
-        let urlString = "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=\(apiKey)&units=metric"
+    enum RequestType {
+        case cityName(city: String)
+        case coordinate(latitude: CLLocationDegrees, longitude: CLLocationDegrees)
+    }
+    
+    func fetchCurrentWeather(forRequestType requestType: RequestType) {
+        var urlString = ""
         
+        switch requestType {
+        case .cityName(let city):
+            urlString = "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=\(apiKey)&units=metric"
+        case .coordinate(let latitude, let longitude):
+            urlString = "https://api.openweathermap.org/data/2.5/weather?lat=\(latitude)&lon=\(longitude)&appid=\(apiKey)&units=metric"
+         
+            performRequest(withURLString: urlString)
+        }
+    }
+    
+    fileprivate func performRequest(withURLString urlString: String) {
         guard let url = URL(string: urlString) else { return }
         let session = URLSession(configuration: .default)
         session.dataTask(with: url) { data, response, error in
